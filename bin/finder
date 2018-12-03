@@ -15,6 +15,7 @@ while clear; : ${CLI_FINDER_MODE:="tree"}; out="$(
         ); \
     fi \
     | fzf --ansi --no-sort --reverse \
+    --height=100% \
     --query="$q" --print-query --expect=ctrl-v,ctrl-l,ctrl-r,ctrl-c,ctrl-i
     )"; do
 
