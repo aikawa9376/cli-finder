@@ -3,9 +3,14 @@
 export LESS='-R -f -i -P ?f%f:(stdin). ?lb%lb?L/%L.. [?eEOF:?pb%pb\%..]'
 
 dir="${1:-$PWD}"
+CLI_FINDER_DIR="file"
 while clear; : ${CLI_FINDER_MODE:="tree"}; out="$(
     if [[ $CLI_FINDER_MODE == "tree" ]]; then \
+      if [[ $CLI_FINDER_DIR == "file" ]]; then \
         tree -a -C -I ".git" --charset=C $dir; \
+      else
+        tree -ad -C -I ".git" --charset=C $dir; \
+      fi
     else \
         (builtin cd $dir; \
         find . -path '*.git*' -prune -o -print \
@@ -16,7 +21,7 @@ while clear; : ${CLI_FINDER_MODE:="tree"}; out="$(
     fi \
     | fzf --ansi --no-sort --reverse \
     --height=100% \
-    --query="$q" --print-query --expect=ctrl-v,ctrl-l,ctrl-r,ctrl-c,ctrl-i
+    --query="$q" --print-query --expect=ctrl-v,ctrl-l,ctrl-r,ctrl-c,ctrl-i,ctrl-d
     )"; do
 
     q="$(head -1 <<< "$out")"
@@ -68,6 +73,14 @@ while clear; : ${CLI_FINDER_MODE:="tree"}; out="$(
                 fi
                 less +Gg "$t"
             fi
+            ;;
+        ctrl-d)
+            if [[ $CLI_FINDER_DIR == "directory" ]]; then
+                CLI_FINDER_DIR="file"
+            else
+                CLI_FINDER_DIR="directory"
+            fi
+            continue
             ;;
         ctrl-v)
             vim "$t"
